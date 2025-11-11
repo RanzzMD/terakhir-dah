@@ -1,0 +1,10 @@
+
+{
+  "name": "solo-leveling-form",
+  "private": true,
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}
