@@ -5,7 +5,7 @@
   "description": "Solo Leveling Form with Telegram Forwarding (Vercel Ready)",
   "type": "commonjs",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "vercel dev",
