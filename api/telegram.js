@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     ].join("\n");
 
     const tgResp = await fetch(
-      `https://api.telegram.org/bot1826888747:8450460240:AAHzRuR3I1g6uZgWl-5eZwU4DD85YWJ74wY/sendMessage`,
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
