@@ -11,7 +11,7 @@ const defaultConfig = {
   font_size: 16,
   form_title: "Forum Pengajuan Izin Digital",
   form_subtitle: "Lengkapi formulir di bawah ini untuk mengajukan izin",
-  submit_button_text: "Kirim Pengajuan"
+  submit_button_text: "Kirim Pengajuan",
 };
 
 // ============================================
@@ -22,7 +22,11 @@ let activeFolder = "SEMUA"; // filter folder aktif
 const LS_KEY = "pengajuan_izin_records_v1";
 
 function loadLocal() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 function saveLocal(arr) {
   localStorage.setItem(LS_KEY, JSON.stringify(arr));
@@ -36,7 +40,7 @@ const dataHandler = {
     currentRecordCount = data.length;
     renderFolders(data);
     renderSubmissions(data);
-  }
+  },
 };
 
 // ============================================
@@ -47,11 +51,14 @@ async function onConfigChange(config = {}) {
   const baseFontStack = "system-ui, -apple-system, sans-serif";
   const baseSize = config.font_size || defaultConfig.font_size;
 
-  const backgroundColor = config.background_color || defaultConfig.background_color;
+  const backgroundColor =
+    config.background_color || defaultConfig.background_color;
   const surfaceColor = config.surface_color || defaultConfig.surface_color;
   const textColor = config.text_color || defaultConfig.text_color;
-  const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
-  const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+  const primaryColor =
+    config.primary_action_color || defaultConfig.primary_action_color;
+  const secondaryColor =
+    config.secondary_action_color || defaultConfig.secondary_action_color;
 
   document.body.style.background = backgroundColor;
   document.body.style.color = textColor;
@@ -64,32 +71,34 @@ async function onConfigChange(config = {}) {
   formTitle.style.fontFamily = `${customFont}, ${baseFontStack}`;
 
   const formSubtitle = document.getElementById("form-subtitle");
-  formSubtitle.textContent = config.form_subtitle || defaultConfig.form_subtitle;
+  formSubtitle.textContent =
+    config.form_subtitle || defaultConfig.form_subtitle;
   formSubtitle.style.fontSize = `${baseSize * 1.25}px`;
   formSubtitle.style.color = "#ffffff";
   formSubtitle.style.fontFamily = `${customFont}, ${baseFontStack}`;
 
   const submitText = document.getElementById("submit-text");
-  submitText.textContent = config.submit_button_text || defaultConfig.submit_button_text;
+  submitText.textContent =
+    config.submit_button_text || defaultConfig.submit_button_text;
 
   // Sesuaikan kartu form/list
-  document.querySelectorAll(".glass-card").forEach(container => {
+  document.querySelectorAll(".glass-card").forEach((container) => {
     container.style.background = surfaceColor;
   });
 
-  document.querySelectorAll("h2").forEach(heading => {
+  document.querySelectorAll("h2").forEach((heading) => {
     heading.style.fontSize = `${baseSize * 1.5}px`;
     heading.style.color = textColor;
     heading.style.fontFamily = `${customFont}, ${baseFontStack}`;
   });
 
-  document.querySelectorAll("label").forEach(label => {
+  document.querySelectorAll("label").forEach((label) => {
     label.style.fontSize = `${baseSize * 0.875}px`;
     label.style.color = textColor;
     label.style.fontFamily = `${customFont}, ${baseFontStack}`;
   });
 
-  document.querySelectorAll("input, textarea, select").forEach(input => {
+  document.querySelectorAll("input, textarea, select").forEach((input) => {
     input.style.fontSize = `${baseSize}px`;
     input.style.color = textColor;
     input.style.borderColor = secondaryColor;
@@ -116,7 +125,7 @@ function showToast(message, type = "success") {
 }
 
 function toISODateFromParts(y, m, d) {
-  const pad = n => String(n).padStart(2, "0");
+  const pad = (n) => String(n).padStart(2, "0");
   return `${y}-${pad(m)}-${pad(d)}`;
 }
 
@@ -131,7 +140,9 @@ function fileToDataURL(file) {
 
 function validateFile(file, maxMB = 5, allowed = []) {
   const okSize = file.size <= maxMB * 1024 * 1024;
-  const okType = allowed.length ? allowed.some(a => file.type.includes(a)) : true;
+  const okType = allowed.length
+    ? allowed.some((a) => file.type.includes(a))
+    : true;
   return okSize && okType;
 }
 
@@ -167,10 +178,16 @@ function renderFolders(data) {
   const tile = (label, count, active) => `
     <button data-folder="${label}"
       class="px-4 py-3 rounded-xl shadow border text-sm font-semibold transition
-             ${active ? "bg-indigo-600 text-white" : "bg-white hover:bg-indigo-50"}">
+             ${
+               active
+                 ? "bg-indigo-600 text-white"
+                 : "bg-white hover:bg-indigo-50"
+             }">
       <div class="flex items-center gap-2">
         <span>📁</span><span>${label}</span>
-        <span class="ml-2 text-xs ${active ? "bg-white/20" : "bg-indigo-100"} rounded-full px-2 py-0.5">
+        <span class="ml-2 text-xs ${
+          active ? "bg-white/20" : "bg-indigo-100"
+        } rounded-full px-2 py-0.5">
           ${count}
         </span>
       </div>
@@ -184,14 +201,17 @@ function renderFolders(data) {
   wrap.innerHTML = `<div class="flex flex-wrap gap-3">${html}</div>`;
 
   // Klik handler
-  wrap.querySelectorAll("button[data-folder]").forEach(btn => {
+  wrap.querySelectorAll("button[data-folder]").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeFolder = btn.getAttribute("data-folder");
       renderFolders(data); // re-render highlight aktif
       // filter
-      const filtered = activeFolder === "SEMUA"
-        ? data
-        : data.filter(r => monthKeyFromISO(r.tanggal_pengajuan) === activeFolder);
+      const filtered =
+        activeFolder === "SEMUA"
+          ? data
+          : data.filter(
+              (r) => monthKeyFromISO(r.tanggal_pengajuan) === activeFolder
+            );
       renderSubmissions(filtered);
     });
   });
@@ -204,23 +224,29 @@ function renderSubmissions(data) {
   const container = document.getElementById("submissions-list");
 
   if (!data || data.length === 0) {
-    container.innerHTML = '<p class="text-center py-8 text-gray-500">Belum ada pengajuan</p>';
+    container.innerHTML =
+      '<p class="text-center py-8 text-gray-500">Belum ada pengajuan</p>';
     return;
   }
 
   const cfg = (window.elementSdk && window.elementSdk.config) || {};
-  const primary = cfg.primary_action_color || defaultConfig.primary_action_color;
+  const primary =
+    cfg.primary_action_color || defaultConfig.primary_action_color;
   const textColor = cfg.text_color || defaultConfig.text_color;
 
-  const sortedData = [...data].sort((a, b) =>
-    new Date(b.tanggal_pengajuan) - new Date(a.tanggal_pengajuan)
+  const sortedData = [...data].sort(
+    (a, b) => new Date(b.tanggal_pengajuan) - new Date(a.tanggal_pengajuan)
   );
 
-  container.innerHTML = sortedData.map((submission, idx) => `
+  container.innerHTML = sortedData
+    .map(
+      (submission, idx) => `
     <div class="submission-card bg-white rounded-xl p-6 shadow-md" style="border-left-color:${primary}">
       <div class="flex justify-between items-start mb-4">
         <div>
-          <h3 class="text-xl font-bold" style="color:${textColor}">${submission.nama_lengkap}</h3>
+          <h3 class="text-xl font-bold" style="color:${textColor}">${
+        submission.nama_lengkap
+      }</h3>
           <p class="text-sm mt-1 opacity-70">NIK: ${submission.nik}</p>
         </div>
         <span class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"
@@ -232,7 +258,9 @@ function renderSubmissions(data) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4 bg-gray-50 p-4 rounded-lg">
         <div>
           <span class="font-semibold block mb-1">📍 Tempat, Tanggal Lahir:</span>
-          <p>${submission.tempat_lahir}, ${new Date(submission.tanggal_lahir).toLocaleDateString("id-ID")}</p>
+          <p>${submission.tempat_lahir}, ${new Date(
+        submission.tanggal_lahir
+      ).toLocaleDateString("id-ID")}</p>
         </div>
         <div>
           <span class="font-semibold block mb-1">📞 Kontak:</span>
@@ -252,25 +280,47 @@ function renderSubmissions(data) {
       </div>
 
       <div class="flex flex-wrap items-center gap-3 mt-2">
-        ${submission.foto_ktp_url ? `
+        ${
+          submission.foto_ktp_url
+            ? `
           <button class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm"
-                  data-viewer='{"type":"auto","title":"Foto KTP - ${submission.nama_lengkap}","src":"${submission.foto_ktp_url.replaceAll('"','&quot;')}"}'>
+                  data-viewer='{"type":"auto","title":"Foto KTP - ${
+                    submission.nama_lengkap
+                  }","src":"${submission.foto_ktp_url.replaceAll(
+                '"',
+                "&quot;"
+              )}"}'>
             Lihat Foto KTP
-          </button>` : ``}
-        ${submission.surat_keterangan_url ? `
+          </button>`
+            : ``
+        }
+        ${
+          submission.surat_keterangan_url
+            ? `
           <button class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm"
-                  data-viewer='{"type":"auto","title":"Surat Keterangan - ${submission.nama_lengkap}","src":"${submission.surat_keterangan_url.replaceAll('"','&quot;')}"}'>
+                  data-viewer='{"type":"auto","title":"Surat Keterangan - ${
+                    submission.nama_lengkap
+                  }","src":"${submission.surat_keterangan_url.replaceAll(
+                '"',
+                "&quot;"
+              )}"}'>
             Lihat Surat
-          </button>` : ``}
+          </button>`
+            : ``
+        }
         <span class="text-xs text-gray-500 ml-auto">
-          Dikirim: ${new Date(submission.tanggal_pengajuan).toLocaleString("id-ID")}
+          Dikirim: ${new Date(submission.tanggal_pengajuan).toLocaleString(
+            "id-ID"
+          )}
         </span>
       </div>
     </div>
-  `).join("");
+  `
+    )
+    .join("");
 
   // Delegasi klik tombol viewer
-  container.querySelectorAll("button[data-viewer]").forEach(btn => {
+  container.querySelectorAll("button[data-viewer]").forEach((btn) => {
     btn.addEventListener("click", () => {
       try {
         const payload = JSON.parse(btn.getAttribute("data-viewer"));
@@ -376,7 +426,9 @@ function setupFilePreviews() {
     } else {
       suratImage.src = "";
       suratImage.classList.add("hidden");
-      suratPreview.querySelector("p").textContent = `Terunggah: ${file.name} (PDF)`;
+      suratPreview.querySelector(
+        "p"
+      ).textContent = `Terunggah: ${file.name} (PDF)`;
     }
     suratPreview.classList.remove("hidden");
   });
@@ -406,7 +458,18 @@ async function onSubmit(e) {
     const email = form.email.value.trim();
     const alasan = form.alasan.value.trim();
 
-    if (!nama_lengkap || !nik || !tempat_lahir || !d || !m || !y || !alamat || !no_telepon || !email || !alasan) {
+    if (
+      !nama_lengkap ||
+      !nik ||
+      !tempat_lahir ||
+      !d ||
+      !m ||
+      !y ||
+      !alamat ||
+      !no_telepon ||
+      !email ||
+      !alasan
+    ) {
       showToast("Lengkapi semua kolom wajib.", "error");
       return;
     }
@@ -418,7 +481,10 @@ async function onSubmit(e) {
       return;
     }
 
-    if (!validateFile(ktpFile, 5, ["image"]) || !validateFile(suratFile, 5, ["image", "pdf"])) {
+    if (
+      !validateFile(ktpFile, 5, ["image"]) ||
+      !validateFile(suratFile, 5, ["image", "pdf"])
+    ) {
       showToast("Validasi file gagal. Periksa ukuran/tipe berkas.", "error");
       return;
     }
@@ -439,7 +505,7 @@ async function onSubmit(e) {
       foto_ktp_url,
       surat_keterangan_url,
       status: "Menunggu",
-      tanggal_pengajuan: new Date().toISOString()
+      tanggal_pengajuan: new Date().toISOString(),
     };
 
     // PRIORITAS: coba via SDK dulu, jika gagal -> fallback local tetap sukses
@@ -480,7 +546,25 @@ async function onSubmit(e) {
       renderSubmissions(local);
     }
 
-    showToast(savedVia === "sdk" ? "Pengajuan berhasil dikirim (SDK)." : "Pengajuan berhasil disimpan (local).");
+    showToast(
+      savedVia === "sdk"
+        ? "Pengajuan berhasil dikirim (SDK)."
+        : "Pengajuan berhasil disimpan (local)."
+    );
+
+    // Kirim ke Telegram backend
+    try {
+      await fetch("/api/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+      console.log("Terkirim ke Telegram bot");
+    } catch (err) {
+      console.warn("Gagal kirim ke Telegram:", err);
+    }
+
+    form.reset();
 
     // Reset form & preview
     form.reset();
@@ -534,7 +618,10 @@ function bootstrap() {
           dataHandler.onDataChanged(data);
         });
       } else if (typeof window.dataSdk.list === "function") {
-        window.dataSdk.list().then(dataHandler.onDataChanged).catch(() => {});
+        window.dataSdk
+          .list()
+          .then(dataHandler.onDataChanged)
+          .catch(() => {});
       }
     } catch (e) {
       console.warn("dataSdk integration warning:", e);
