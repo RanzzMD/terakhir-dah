@@ -1,16 +1,16 @@
-// Vercel Serverless Function: /api/telegram
-// Sends form submission to your Telegram chat using a bot
-// Required env vars in Vercel Project Settings -> Environment Variables:
-//   BOT_TOKEN, CHAT_ID
+// api/telegram.js
+// Vercel serverless function — expects BOT_TOKEN and CHAT_ID in project env vars
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "METHOD_NOT_ALLOWED" });
   }
+
   const BOT_TOKEN = process.env.BOT_TOKEN;
   const CHAT_ID = process.env.CHAT_ID;
   if (!BOT_TOKEN || !CHAT_ID) {
     return res.status(500).json({ ok: false, error: "MISSING_ENV" });
   }
+
   try {
     const payload = req.body || {};
     const {
@@ -58,12 +58,14 @@ export default async function handler(req, res) {
         }),
       }
     );
+
     const data = await tgResp.json();
     if (!data.ok) {
       return res
         .status(502)
         .json({ ok: false, error: "TELEGRAM_API_ERROR", data });
     }
+
     return res.json({ ok: true });
   } catch (e) {
     console.error(e);
